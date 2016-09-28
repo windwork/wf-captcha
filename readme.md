@@ -16,6 +16,6 @@ if (!\wf\captcha\Code::check(@$_POST['secode']), 'login') {
 ```
 
 ## 效果预览
-![效果图](example-1.png)
+![效果图](res/example-1.png)
 
-![效果图](example-2.jpg)
+![效果图](res/example-2.jpg)
