@@ -27,22 +27,19 @@ namespace wf\captcha;
  * @since       0.1.0
  */
 interface ICaptcha {
-
+	
 	/**
-	 * 验证验证码是否正确
-	 *
-	 * @param string $code 用户验证码
-	 * @param string $id = 'sec' 下标
-	 * @return bool 用户验证码是否正确
+	 * 设置配置信息
+	 * 
+	 * @param array $cfg
+	 * @return \wf\captcha\ICaptcha
 	 */
-	public function check($code, $id = 'sec');
-
+	public function setCfg(array $cfg);
+	
 	/**
-	 * 输出验证码并把验证码的值保存的session中
-	 * 验证码保存到session的格式为：
-	 *  $_SESSION[self::$seKey] = array('code' => '验证码值', 'time' => '验证码创建时间');
+	 * 输出验证码并把在服务器端保存验证码
 	 *  
-	 * @param string $id = 'sec'
+	 * @param string $id = 'sec' 验证码类别，如登录）login；注册）regster
 	 */
 	public function render($id = 'sec');
 }

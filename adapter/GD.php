@@ -16,195 +16,199 @@ namespace wf\captcha\adapter;
  * 可配置的属性都是一些简单直观的变量，我就不用弄一堆的setter/getter了
  * 
  * useage:
- * $capt = \wf\captcha\CaptchaFactory::create();
- * $capt->render();
+ * $capt = \wf\Factory::captcha();
+ * $capt->setCfg($cfg);
+ * $capt->entry();
  * 
  *  验证码对比校验
- *  if (!\wf\captcha\CaptchaFactory::create()->check(@$_POST['secode'])) {
+ *  if (!\wf\captcha\Code::check(@$_POST['secode'], $id)) {
  *  	print 'error secode';
  *  }
  * 
  * @package     wf.captcha.adapter
- * @author      erzh <cmpan@qq.com>
- * @link        http://www.windwork.org/manual/wf.captcha.html
- * @since       0.1.0
+ * @author      cmm <cmm@windwork.org>
+ * @link        http://www.windwork.org/manual/wf.adapter.captcha.html
+ * @since       1.0.0
  */
-class GD implements \wf\captcha\ICaptcha {	
-		
-	/**
-	 * 文字倾斜度范围
-	 * 
-	 * @var bool
-	 */
-	public $gradient  = 18;
-	
-	/**
-	 * 验证码过期时间（s）
-	 * @var int
-	 */
-	public static $expire    = 3000;
-	
-	/**
-	 * 验证码位数
-	 * @var int
-	 */
-	public $length = 4;        // 验证码位数
-	
-	/**
-	 * 验证码的session的下标
-	 * 
-	 * @var string
-	 */
-	const SESS_KEY = 'wf.captcha.code';
-	
-	/**
-	 * 背景颜色
-	 * @var array
-	 */
-	public $bgColor = array(243, 251, 254);
-	
-	/**
-	 * 
-	 * @var array
-	 */
-	public static $lang = array(
-		'tip' => '色验证码',
-		'color' => array(
-			'red'    => '红',
-			'green'  => '绿',
-			'blue'   => '蓝',
-			'purple' => '紫',
-			'black'  => '黑',
-		)
-	);
-	
-	/**
-	 * 验证码中使用的字符，0O、1I、2Z容易混淆，建议不用
-	 *
-	 * @var string
-	 */
-	private $codeSet = '3456789ABCDEFHKLMNPQRSTUVWXY';
-	
-	/**
-	 * 验证验证码是否正确
-	 *
-	 * @param string $code 用户验证码
-	 * @param string $id 下标
-	 * @return bool 用户验证码是否正确
-	 */
-	public function check($code, $id = 'sec') {		
-		isset($_SESSION) || session_start();
-		
-		// 验证码不能为空
-		if(empty($code) || empty($_SESSION[self::SESS_KEY])) {
-			return false;
-		}
-		
-		$secode =  @$_SESSION[self::SESS_KEY][$id];
-		
-		// session 过期检查
-		if(time() - $secode['time'] > self::$expire) {
-			return false;
-		}
-
-		if(strtoupper($code) == strtoupper($secode['code'])) {
-			return true;
-		}
-
-		return false;
-	}
+class GD implements \wf\captcha\ICaptcha {
+	private $cfg = [
+		'bg'        => [243, 251, 254], // 验证码背景颜色
+		'expire'    => 3000,   // 验证码过期时间（s）
+		'useBgImg'  => false,  // 是否使用背景图片 
+		'useCurve'  => true,   // 是否画混淆曲线
+		'useNoise'  => true,   // 是否添加杂点	
+		'gradient'  => 22,     // 文字倾斜度范围
+		'fontSize'  => 25,     // 验证码字体大小(px)
+		'height'    => 0,      // 验证码图片高
+		'width'     => 0,      // 验证码图片宽
+		'length'    => 4,      // 验证码位数
+		'ttfs'      => ['1.ttf'],  // 验证码使用字体列表
+		'bgs'       => ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg'], // 验证码使用背景图片列表
+	];
 
 	/**
 	 * 
 	 * {@inheritDoc}
+	 * @see \wf\captcha\ICaptcha::setCfg()
+	 */
+	public function setCfg(array $cfg) {
+		$this->cfg = array_merge($this->cfg, $cfg);
+		return $this;
+	}
+	
+	/**
+	 * 验证码中使用的字符，01IO容易混淆，建议不用
+	 *
+	 * @var string
+	 */
+	private $codeSet = '3456789AbcDEFHKLMNPQRSTUVWXY';
+	private $image   = null;     // 验证码图片实例
+	private $color   = null;     // 验证码字体颜色
+
+	/**
+	 * 生成验证码
+	 * {@inheritDoc}
 	 * @see \wf\captcha\ICaptcha::render()
 	 */
-	public function render($id = 'sec') {
-		$id || $id = 'sec';
+	public function render($id = 'sec') {		
+		//$this->cfg['bg'] = [mt_rand(200, 255), mt_rand(200, 255), mt_rand(200, 255)];
 		
-		$width = 200; // 图片宽(px)
-		$height = 80; // 图片高(px)
-		$fontSize = 15;
+		// 图片宽(px)
+		$this->cfg['width'] || $this->cfg['width'] = $this->cfg['length'] * $this->cfg['fontSize'] * 1.25; 
 		
-		// 建立图片
-		$image = imagecreate(200, 80); 
+		// 图片高(px)
+		$this->cfg['height'] || $this->cfg['height'] = $this->cfg['fontSize'] * 1.5;
 		
-		// 设置背颜色  
-		imagecolorallocate($image, $this->bgColor[0], $this->bgColor[1], $this->bgColor[2]); 
+		// 建立一幅 $this->cfg['width'] x $this->cfg['height'] 的图像
+		$this->image = imagecreate($this->cfg['width'], $this->cfg['height']); 
+		
+		// 设置背景      
+		imagecolorallocate($this->image, $this->cfg['bg'][0], $this->cfg['bg'][1], $this->cfg['bg'][2]); 
 		
 		// 验证码字体随机颜色
-		$colorList = array(
-			array('label' => static::$lang['color']['red'],    'color' => array(0xff, 0x00, 0x00)),
-			array('label' => static::$lang['color']['green'],  'color' => array(0x00, 0xff, 0x66)),
-			array('label' => static::$lang['color']['blue'],   'color' => array(0x00, 0x66, 0xff)),
-			array('label' => static::$lang['color']['purple'], 'color' => array(0x99, 0x00, 0xff)),
-			array('label' => static::$lang['color']['black'],  'color' => array(0x00, 0x00, 0x00)),
-		);
-		shuffle($colorList);
-
-		// 验证码颜色
-		$fontColorRand = array_pop($colorList);
-		$fontColor = $fontColorRand['color'];
-		$realFontColor = imagecolorallocate($image, $fontColor[0], $fontColor[1], $fontColor[2]);
-
-		// 绘制一个验证码字符
-		$labelColor = imagecolorallocate($image, 0x99, 0x99, 0x99);
-		imagettftext($image, 20, 0, 40, 28, $labelColor, __DIR__ . '/res/label.otf', "{$fontColorRand['label']}");
-		imagettftext($image, 14, 0, 70, 26, $labelColor, __DIR__ . '/res/label.otf', static::$lang['tip']);
+		$this->color = imagecolorallocate($this->image, mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100));
 		
-		// 干扰验证码颜色
-		$mix1 = array_pop($colorList);
-		$mix1Color = $mix1['color'];
-		$mixFontColor1 = imagecolorallocate($image, $mix1Color[0], $mix1Color[1], $mix1Color[2]);
+		// 验证码使用随机字体
+		$ttf = dirname(__DIR__) . '/res/ttfs/' . $this->cfg['ttfs'][array_rand($this->cfg['ttfs'])];	
 		
-		$mix2 = array_pop($colorList);
-		$mix2Color = $mix2['color'];
-		$mixFontColor2 = imagecolorallocate($image, $mix2Color[0], $mix2Color[1], $mix2Color[2]);
+		// 绘制干扰信息
+		if($this->cfg['useBgImg']) {
+			$this->background(); // 添加背景图片
+		} elseif ($this->cfg['useNoise']) {
+			$this->writeNoise(); // 绘杂点
+		}
+		$this->cfg['useCurve'] && $this->writeCurve(); // 绘干扰线
 		
-		// 验证码字体
-		$ttf = __DIR__ . '/res/code.ttf';
-		
-		// 验证码位置
-		$posPossibleArr = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
-		shuffle($posPossibleArr);
-		$posArr = array_slice($posPossibleArr, 0, $this->length);
-				
-		$codeNX = - mt_rand($fontSize*0.1, $fontSize*0.3); // 验证码第N个字符的左边距
-		$mixCount = 0;
-		$codeStr = '';
-		
-		for ($i = 0; $i < 12; $i++) {
-			$codeNX += mt_rand($fontSize*0.95, $fontSize*1.1); // 字符横向位置
-			$codeNY = mt_rand(36 + $fontSize*1.25, 36 + $fontSize*1.36); // 字符纵向位置
-			$gradient = mt_rand(-$this->gradient, $this->gradient);	// 字符倾斜度
-			$char = $this->codeSet[mt_rand(0, strlen($this->codeSet) - 1)]; // 随机字符
+		// 绘验证码
+		$code = []; // 验证码
+		$codeNX = - mt_rand($this->cfg['fontSize']*0.3, $this->cfg['fontSize']*0.6); // 验证码第N个字符的左边距		
+		for ($i = 0; $i<$this->cfg['length']; $i++) {
+			$code[$i] = $this->codeSet[mt_rand(0, strlen($this->codeSet)-1)];
+			$codeNX += mt_rand($this->cfg['fontSize']*0.95, $this->cfg['fontSize']*1.1);
+			$gradient = mt_rand(-$this->cfg['gradient'], $this->cfg['gradient']);	
 			
-			// 字符颜色
-			if (in_array($i, $posArr)) {
-				$color = $realFontColor;
-				$codeStr .= $char;
-			} else {
-				$color = $mixCount < 4 ? $mixFontColor1 : $mixFontColor2;
-				$mixCount ++;
-			}
-			
-			// 绘制一个验证码字符
-			imagettftext($image, $fontSize, $gradient, $codeNX, $codeNY, $color, $ttf, $char);
+			// 写一个验证码字符
+			imagettftext($this->image, $this->cfg['fontSize'], $gradient, $codeNX, mt_rand($this->cfg['fontSize']*1.25, $this->cfg['fontSize']*1.36), $this->color/*imagecolorallocate($this->image, mt_rand(1,130), mt_rand(1,130), mt_rand(1,130))*/, $ttf, $code[$i]);
 		}
 		
 		// 保存验证码
-		isset($_SESSION) || session_start();
-		$_SESSION[self::SESS_KEY][$id]['code'] = $codeStr; // 把校验码保存到session
-		$_SESSION[self::SESS_KEY][$id]['time'] = time();  // 验证码创建时间
+		\wf\captcha\Code::save(join('', $code), time() + $this->cfg['expire'], $id);
 
 		header('Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate');
 		header('Cache-Control: post-check=0, pre-check=0', false);		
 		header('Pragma: no-cache');
 		header("content-type: image/png");
 	
-		// 输出图像
-		imagepng($image); 
-		imagedestroy($image);
+		// 输出验证码图像
+		imagepng($this->image); 
+		imagedestroy($this->image);
+	}
+	
+	/** 
+	 * 画一条由两条连在一起构成的随机正弦函数曲线作干扰线(你可以改成更帅的曲线函数) 
+     *      
+     *      高中的数学公式咋都忘了涅，写出来
+	 *		正弦型函数解析式：y=Asin(ωx+φ)+b
+	 *      各常数值对函数图像的影响：
+	 *        A：决定峰值（即纵向拉伸压缩的倍数）
+	 *        b：表示波形在Y轴的位置关系或纵向移动距离（上加下减）
+	 *        φ：决定波形与X轴位置关系或横向移动距离（左加右减）
+	 *        ω：决定周期（最小正周期T=2π/∣ω∣）
+	 *
+	 */
+    protected function writeCurve() {
+    	$px = $py = 0;
+		// 曲线前部分
+		$A = mt_rand(1, $this->cfg['height']/2);                  // 振幅
+		$b = mt_rand(-$this->cfg['height']/4, $this->cfg['height']/4);   // Y轴方向偏移量
+		$f = mt_rand(-$this->cfg['height']/4, $this->cfg['height']/4);   // X轴方向偏移量
+		$T = mt_rand($this->cfg['height'], $this->cfg['width']*2);      // 周期
+		$w = (2* M_PI)/$T;
+						
+		$px1 = 0;  // 曲线横坐标起始位置
+		$px2 = mt_rand($this->cfg['width']/2, $this->cfg['width'] * 0.8);  // 曲线横坐标结束位置
+
+		for ($px = $px1; $px <= $px2; $px = $px+ 0.5) {
+			if ($w!=0) {
+				$py = $A * sin($w*$px + $f)+ $b + $this->cfg['height']/2;  // y = Asin(ωx+φ) + b
+				$i = (int) ($this->cfg['fontSize']/6);
+				while ($i > 0) {	
+				    imagesetpixel($this->image, $px , $py + $i, $this->color);  // 这里(while)循环画像素点比imagettftext和imagestring用字体大小一次画出（不用这while循环）性能要好很多				    
+				    $i--;
+				}
+			}
+		}
+		
+		// 曲线后部分
+		$A = mt_rand(1, $this->cfg['height']/2);                  // 振幅		
+		$f = mt_rand(-$this->cfg['height']/4, $this->cfg['height']/4);   // X轴方向偏移量
+		$T = mt_rand($this->cfg['height'], $this->cfg['width']*2);      // 周期
+		$w = (2* M_PI)/$T;		
+		$b = $py - $A * sin($w*$px + $f) - $this->cfg['height']/2;
+		$px1 = $px2;
+		$px2 = $this->cfg['width'];
+
+		for ($px = $px1; $px <= $px2; $px = $px+ 0.5) {
+			if ($w!=0) {
+				$py = $A * sin($w*$px + $f)+ $b + $this->cfg['height']/2;  // y = Asin(ωx+φ) + b
+				$i = (int) ($this->cfg['fontSize']/6);
+				while ($i > 0) {			
+				    imagesetpixel($this->image, $px, $py + $i, $this->color);
+				    $i--;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 画杂点
+	 * 往图片上写不同颜色的字母或数字
+	 */
+	protected function writeNoise() {
+		for($i = 0; $i < $this->cfg['fontSize']/4; $i++){
+			//杂点颜色
+		    $noiseColor = imagecolorallocate($this->image, mt_rand(150, 255), mt_rand(150, 255), mt_rand(150, 255));
+		    
+		    for ($j = 0; $j < 4; $j++) {
+		    	// 绘杂点
+		    	imagestring($this->image, 5, mt_rand(-10, $this->cfg['width']), mt_rand(-10, $this->cfg['height']), $this->codeSet[mt_rand(0, 25)], $noiseColor);
+		    }		    
+		}
+	}
+	
+	/**
+	 * 绘制背景图片
+	 */
+	private function background() {
+		// 随机选择背景图片
+		$bgImgPath = dirname(__DIR__) . '/res/bgs/' . $this->cfg['bgs'][array_rand($this->cfg['bgs'])];
+
+		list($width, $height) = @getimagesize($bgImgPath);
+		
+		// Resample
+		$bgImage = @imagecreatefromjpeg($bgImgPath);
+		@imagecopyresampled($this->image, $bgImage, 0, 0, 0, 0, $this->cfg['width'], $this->cfg['height'], $width, $height);
+		@imagedestroy($bgImage);
 	}
 }
 
