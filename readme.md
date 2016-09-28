@@ -6,13 +6,16 @@
 //useage:
 // 生成验证码
 $capt = \wf\captcha\CaptchaFactory::create();
-$capt->render();
+$secId = 'login';
+$capt->render($secId);
 
 // 验证码对比校验
-if (!\wf\captcha\CaptchaFactory::create()->check(@$_POST['secode'])) {
+if (!\wf\captcha\Code::check(@$_POST['secode']), 'login') {
      print 'error secode';
 }
 ```
 
 ## 效果预览
-![效果图](example.jpg)
+![效果图](example-1.png)
+
+![效果图](example-2.jpg)
