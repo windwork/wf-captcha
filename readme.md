@@ -19,8 +19,8 @@ if (!\wf\captcha\Code::check(@$_POST['secode']), 'login') {
 
 - 普通效果 
 
-![效果图](res/example-1.png)
+![效果图](assets/example-1.png)
 
 - 高级效果 
 
-![效果图](res/example-2.jpg)
+![效果图](assets/example-2.jpg)

@@ -91,8 +91,8 @@ class GDSafety implements \wf\captcha\ICaptcha {
 
 		// 绘制一个验证码字符
 		$labelColor = imagecolorallocate($image, 0x99, 0x99, 0x99);
-		imagettftext($image, 20, 0, 40, 28, $labelColor, dirname(__DIR__) . '/res/label.otf', "{$fontColorRand['label']}");
-		imagettftext($image, 14, 0, 70, 26, $labelColor, dirname(__DIR__) . '/res/label.otf', $this->cfg['lang']['tip']);
+		imagettftext($image, 20, 0, 40, 28, $labelColor, dirname(__DIR__) . '/assets/label.otf', "{$fontColorRand['label']}");
+		imagettftext($image, 14, 0, 70, 26, $labelColor, dirname(__DIR__) . '/assets/label.otf', $this->cfg['lang']['tip']);
 		
 		// 干扰验证码颜色
 		$mix1 = array_pop($colorList);
@@ -104,7 +104,7 @@ class GDSafety implements \wf\captcha\ICaptcha {
 		$mixFontColor2 = imagecolorallocate($image, $mix2Color[0], $mix2Color[1], $mix2Color[2]);
 		
 		// 验证码字体
-		$ttf = dirname(__DIR__) . '/res/code.ttf';
+		$ttf = dirname(__DIR__) . '/assets/code.ttf';
 		
 		// 验证码位置
 		$posPossibleArr = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
