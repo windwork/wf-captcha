@@ -1,7 +1,7 @@
 {
   "name" : "windwork/captcha",
   "description" : "windwork captcha component",
-  "version" : "0.1.0",
+  "version" : "0.2.0",
   "require" : {
     "php" : ">=5.5.0"
   },
