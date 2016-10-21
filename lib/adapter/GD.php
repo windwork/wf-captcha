@@ -89,7 +89,7 @@ class GD implements \wf\captcha\ICaptcha {
 		$this->color = imagecolorallocate($this->image, mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100));
 		
 		// 验证码使用随机字体
-		$ttf = dirname(__DIR__) . '/assets/ttfs/' . $this->cfg['ttfs'][array_rand($this->cfg['ttfs'])];	
+		$ttf = dirname(dirname(__DIR__)) . '/assets/ttfs/' . $this->cfg['ttfs'][array_rand($this->cfg['ttfs'])];	
 		
 		// 绘制干扰信息
 		if($this->cfg['useBgImg']) {
@@ -201,7 +201,7 @@ class GD implements \wf\captcha\ICaptcha {
 	 */
 	private function background() {
 		// 随机选择背景图片
-		$bgImgPath = dirname(__DIR__) . '/assets/bgs/' . $this->cfg['bgs'][array_rand($this->cfg['bgs'])];
+		$bgImgPath = dirname(dirname(__DIR__)) . '/assets/bgs/' . $this->cfg['bgs'][array_rand($this->cfg['bgs'])];
 
 		list($width, $height) = @getimagesize($bgImgPath);
 		
