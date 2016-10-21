@@ -2,7 +2,7 @@
   "name" : "windwork/captcha",
   "description" : "windwork captcha component",
   "keywords": ["captcha","anti robot"],
-  "version" : "0.2.1",
+  "version" : "0.2.2",
   "require" : {
     "php" : ">=5.5.0",
     "ext-gd" : "*",
@@ -10,7 +10,7 @@
   "license" : "MIT",
   "autoload" : {
     "psr-4" : {
-      "wf\\captcha\\" : "."
+      "wf\\captcha\\" : "lib"
     }
   },
   "type" : "library",
