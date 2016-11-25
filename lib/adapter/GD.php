@@ -35,12 +35,12 @@ class GD implements \wf\captcha\ICaptcha {
 		'bg'        => [243, 251, 254], // 验证码背景颜色
 		'expire'    => 3000,   // 验证码过期时间（s）
 		'useBgImg'  => false,  // 是否使用背景图片 
-		'useCurve'  => true,   // 是否画混淆曲线
+		'useCurve'  => false,  // 是否画混淆曲线
 		'useNoise'  => true,   // 是否添加杂点	
 		'gradient'  => 22,     // 文字倾斜度范围
-		'fontSize'  => 25,     // 验证码字体大小(px)
-		'height'    => 0,      // 验证码图片高
-		'width'     => 0,      // 验证码图片宽
+		'fontSize'  => 16,     // 验证码字体大小(px)
+		'height'    => 0,      // 验证码图片高，0为根据fontSize自动计算
+		'width'     => 0,      // 验证码图片宽，0为根据fontSize自动计算
 		'length'    => 4,      // 验证码位数
 		'ttfs'      => ['1.ttf'],  // 验证码使用字体列表
 		'bgs'       => ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg'], // 验证码使用背景图片列表
@@ -71,13 +71,11 @@ class GD implements \wf\captcha\ICaptcha {
 	 * @see \wf\captcha\ICaptcha::render()
 	 */
 	public function render($id = 'sec') {		
-		//$this->cfg['bg'] = [mt_rand(200, 255), mt_rand(200, 255), mt_rand(200, 255)];
-		
 		// 图片宽(px)
-		$this->cfg['width'] || $this->cfg['width'] = $this->cfg['length'] * $this->cfg['fontSize'] * 1.25; 
+		$this->cfg['width'] || $this->cfg['width'] = $this->cfg['length'] * $this->cfg['fontSize'] * 1.35; 
 		
 		// 图片高(px)
-		$this->cfg['height'] || $this->cfg['height'] = $this->cfg['fontSize'] * 1.5;
+		$this->cfg['height'] || $this->cfg['height'] = $this->cfg['fontSize'] * 2;
 		
 		// 建立一幅 $this->cfg['width'] x $this->cfg['height'] 的图像
 		$this->image = imagecreate($this->cfg['width'], $this->cfg['height']); 
@@ -136,8 +134,9 @@ class GD implements \wf\captcha\ICaptcha {
 	 *        ω：决定周期（最小正周期T=2π/∣ω∣）
 	 *
 	 */
-    protected function writeCurve() {
+    protected function writeCurve() {    	
     	$px = $py = 0;
+    	
 		// 曲线前部分
 		$A = mt_rand(1, $this->cfg['height']/2);                  // 振幅
 		$b = mt_rand(-$this->cfg['height']/4, $this->cfg['height']/4);   // Y轴方向偏移量
@@ -148,14 +147,16 @@ class GD implements \wf\captcha\ICaptcha {
 		$px1 = 0;  // 曲线横坐标起始位置
 		$px2 = mt_rand($this->cfg['width']/2, $this->cfg['width'] * 0.8);  // 曲线横坐标结束位置
 
-		for ($px = $px1; $px <= $px2; $px = $px+ 0.5) {
-			if ($w!=0) {
-				$py = $A * sin($w*$px + $f)+ $b + $this->cfg['height']/2;  // y = Asin(ωx+φ) + b
-				$i = (int) ($this->cfg['fontSize']/6);
-				while ($i > 0) {	
-				    imagesetpixel($this->image, $px , $py + $i, $this->color);  // 这里(while)循环画像素点比imagettftext和imagestring用字体大小一次画出（不用这while循环）性能要好很多				    
-				    $i--;
-				}
+		for ($px = $px1; $px <= $px2; $px ++) {
+			if ($w == 0) {
+				break;
+			}
+			
+			$py = $A * sin($w*$px + $f)+ $b + $this->cfg['height']/2;  // y = Asin(ωx+φ) + b
+			$i = (int) ($this->cfg['fontSize']/6);
+			while ($i > 0) {	
+			    imagesetpixel($this->image, $px, $py + $i, $this->color);  // 这里(while)循环画像素点比imagettftext和imagestring用字体大小一次画出（不用这while循环）性能要好很多				    
+			    $i--;
 			}
 		}
 		
@@ -168,14 +169,16 @@ class GD implements \wf\captcha\ICaptcha {
 		$px1 = $px2;
 		$px2 = $this->cfg['width'];
 
-		for ($px = $px1; $px <= $px2; $px = $px+ 0.5) {
-			if ($w!=0) {
-				$py = $A * sin($w*$px + $f)+ $b + $this->cfg['height']/2;  // y = Asin(ωx+φ) + b
-				$i = (int) ($this->cfg['fontSize']/6);
-				while ($i > 0) {			
-				    imagesetpixel($this->image, $px, $py + $i, $this->color);
-				    $i--;
-				}
+		for ($px = $px1; $px <= $px2; $px ++) {
+			if ($w == 0) {
+				break;
+			}
+			
+			$py = $A * sin($w*$px + $f)+ $b + $this->cfg['height']/2;  // y = Asin(ωx+φ) + b
+			$i = (int) ($this->cfg['fontSize']/6);
+			while ($i > 0) {			
+			    imagesetpixel($this->image, $px, $py + $i, $this->color);
+			    $i--;
 			}
 		}
 	}
