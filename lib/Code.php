@@ -32,6 +32,9 @@ class Code {
 		}
 	
 		$secode =  $_SESSION[self::SESS_KEY][$id];
+		
+		// 用过立即清掉，不允许重复使用，防暴力破解
+		unset($_SESSION[self::SESS_KEY][$id]);
 	
 		// session 过期检查
 		if(time() > $secode['expire']) {
