@@ -16,4 +16,7 @@ namespace wf\captcha;
  * @author      cm <cmpan@qq.com>
  * @since       0.1.0
  */
-class Exception extends \Exception {}
+class Exception extends \Exception 
+{
+    
+}
