@@ -4,10 +4,10 @@
  * 
  * 一个开源的PHP轻量级高效Web开发框架
  * 
- * @copyright   Copyright (c) 2008-2016 Windwork Team. (http://www.windwork.org)
- * @license     http://opensource.org/licenses/MIT	MIT License
+ * @copyright Copyright (c) 2008-2017 Windwork Team. (http://www.windwork.org)
+ * @license   http://opensource.org/licenses/MIT
  */
-namespace wf\captcha\adapter;
+namespace wf\captcha\strategy;
 
 /**
  * 验证码(GD库实现)
@@ -25,14 +25,14 @@ namespace wf\captcha\adapter;
  *  	print 'error secode';
  *  }
  * 
- * @package     wf.captcha.adapter
+ * @package     wf.captcha.strategy
  * @author      cmm <cmm@windwork.org>
- * @link        http://www.windwork.org/manual/wf.adapter.captcha.html
+ * @link        http://docs.windwork.org/manual/wf.captcha.html
  * @since       1.0.0
  */
 class GD implements \wf\captcha\ICaptcha {
 	private $cfg = [
-		'bg'        => [243, 251, 254], // 验证码背景颜色
+		'bg'        => [255, 255, 255], // 验证码背景颜色
 		'expire'    => 3000,   // 验证码过期时间（s）
 		'useBgImg'  => false,  // 是否使用背景图片 
 		'useCurve'  => false,  // 是否画混淆曲线
@@ -45,15 +45,9 @@ class GD implements \wf\captcha\ICaptcha {
 		'ttfs'      => ['1.ttf'],  // 验证码使用字体列表
 		'bgs'       => ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg'], // 验证码使用背景图片列表
 	];
-
-	/**
-	 * 
-	 * {@inheritDoc}
-	 * @see \wf\captcha\ICaptcha::setCfg()
-	 */
-	public function setCfg(array $cfg) {
-		$this->cfg = array_merge($this->cfg, $cfg);
-		return $this;
+	
+	public function __construct(array $cfg = []) {
+		$this->cfg = array_replace_recursive($this->cfg, $cfg);
 	}
 	
 	/**

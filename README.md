@@ -10,12 +10,12 @@
 ```
 //useage:
 // 生成验证码
-$capt = \wf\captcha\CaptchaFactory::create();
+$capt = new \wf\captcha\strategy\GDSimple();
 $secId = 'login';
 $capt->render($secId);
 
 // 验证码对比校验
-if (!\wf\captcha\Code::check(@$_POST['secode']), 'login') {
+if (!\wf\captcha\Code::check(@$_POST['secode'], 'login')) {
      print 'error secode';
 }
 ```
@@ -64,7 +64,7 @@ $cfg = [
 	'useCurve'  => true,   // 是否画混淆曲线
 	'useNoise'  => false,   // 是否添加杂点	
 ];
-$capt = \wf\captcha\CaptchaFactory::create();
+$capt = new \wf\captcha\strategy\GDSimple();
 
 // 设置参数
 $capt->setCfg($cfg);

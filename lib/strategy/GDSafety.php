@@ -4,10 +4,10 @@
  * 
  * 一个开源的PHP轻量级高效Web开发框架
  * 
- * @copyright   Copyright (c) 2008-2016 Windwork Team. (http://www.windwork.org)
- * @license     http://opensource.org/licenses/MIT	MIT License
+ * @copyright Copyright (c) 2008-2017 Windwork Team. (http://www.windwork.org)
+ * @license   http://opensource.org/licenses/MIT
  */
-namespace wf\captcha\adapter;
+namespace wf\captcha\strategy;
 
 /**
  * 验证码(GD库实现)
@@ -15,12 +15,12 @@ namespace wf\captcha\adapter;
  * 加入混淆字符串，从中选择一个颜色的验证码。
  * 
  * useage:
- * $capt = \wf\captcha\CaptchaFactory::create();
- * $capt->render();
+ * $capt = app()->getDi()->captcha();
+ * $capt->render('id');
  * 
- * @package     wf.captcha.adapter
- * @author      erzh <cmpan@qq.com>
- * @link        http://www.windwork.org/manual/wf.captcha.html
+ * @package     wf.captcha.strategy
+ * @author      cm <cmpan@qq.com>
+ * @link        http://docs.windwork.org/manual/wf.captcha.html
  * @since       0.1.0
  */
 class GDSafety implements \wf\captcha\ICaptcha {	
@@ -41,14 +41,9 @@ class GDSafety implements \wf\captcha\ICaptcha {
 		],
 	];
 
-	/**
-	 * 
-	 * {@inheritDoc}
-	 * @see \wf\captcha\ICaptcha::setCfg()
-	 */
-	public function setCfg(array $cfg) {
-		$this->cfg = array_merge($this->cfg, $cfg);
-		return $this;
+	public function __construct(array $cfg = []) 
+	{
+	    $this->cfg = array_replace_recursive($this->cfg, $cfg);
 	}
 	
 	/**
@@ -63,7 +58,10 @@ class GDSafety implements \wf\captcha\ICaptcha {
 	 * {@inheritDoc}
 	 * @see \wf\captcha\ICaptcha::render()
 	 */
-	public function render($id = 'sec') {		
+	public function render($id = 'sec') 
+	{	
+	    $ttfDir = dirname(dirname(__DIR__)) . '/assets/safety';
+	    
 		$width = 200; // 图片宽(px)
 		$height = 80; // 图片高(px)
 		$fontSize = 15;
@@ -91,8 +89,8 @@ class GDSafety implements \wf\captcha\ICaptcha {
 
 		// 绘制一个验证码字符
 		$labelColor = imagecolorallocate($image, 0x99, 0x99, 0x99);
-		imagettftext($image, 20, 0, 40, 28, $labelColor, dirname(__DIR__) . '/assets/label.otf', "{$fontColorRand['label']}");
-		imagettftext($image, 14, 0, 70, 26, $labelColor, dirname(__DIR__) . '/assets/label.otf', $this->cfg['lang']['tip']);
+		imagettftext($image, 20, 0, 40, 28, $labelColor, $ttfDir . '/label.otf', "{$fontColorRand['label']}");
+		imagettftext($image, 14, 0, 70, 26, $labelColor, $ttfDir . '/label.otf', $this->cfg['lang']['tip']);
 		
 		// 干扰验证码颜色
 		$mix1 = array_pop($colorList);
@@ -104,7 +102,7 @@ class GDSafety implements \wf\captcha\ICaptcha {
 		$mixFontColor2 = imagecolorallocate($image, $mix2Color[0], $mix2Color[1], $mix2Color[2]);
 		
 		// 验证码字体
-		$ttf = dirname(__DIR__) . '/assets/code.ttf';
+		$ttf = $ttfDir . '/code.ttf';
 		
 		// 验证码位置
 		$posPossibleArr = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);

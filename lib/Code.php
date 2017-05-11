@@ -4,8 +4,8 @@
  * 
  * 一个开源的PHP轻量级高效Web开发框架
  * 
- * @copyright   Copyright (c) 2008-2016 Windwork Team. (http://www.windwork.org)
- * @license     http://opensource.org/licenses/MIT	MIT License
+ * @copyright Copyright (c) 2008-2017 Windwork Team. (http://www.windwork.org)
+ * @license   http://opensource.org/licenses/MIT
  */
 namespace wf\captcha;
 
@@ -13,7 +13,7 @@ namespace wf\captcha;
  * 验证码存储及检查
  */
 class Code {
-	const SESS_KEY = 'sid.captcha.windwork.org';
+	const SESS_KEY = '@captcha_sk';
 	
 	/**
 	 * 验证验证码是否正确
