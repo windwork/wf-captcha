@@ -25,7 +25,9 @@ class Code
      */
     public static function check($code, $id = 'sec') 
     {
-        $id || $id = 'sec';        
+        $id || $id = 'sec';
+        $id = preg_replace("/[^0-9a-z\\-_]/i", '', $id);
+        
         isset($_SESSION) || session_start();
     
         // 验证码不能为空
@@ -59,6 +61,8 @@ class Code
     public static function save($code, $expire, $id = 'sec') 
     {
         $id || $id = 'sec';
+        $id = preg_replace("/[^0-9a-z\\-_]/i", '', $id);
+        
         isset($_SESSION) || session_start();
 
         $_SESSION[self::SESS_KEY][$id]['code'] = $code; // 把校验码保存到session
