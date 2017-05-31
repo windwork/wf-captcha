@@ -68,4 +68,30 @@ class Code
         $_SESSION[self::SESS_KEY][$id]['code'] = $code; // 把校验码保存到session
         $_SESSION[self::SESS_KEY][$id]['expire'] = $expire;  // 验证码创建时间
     }
+    
+    /**
+     * 水平扭曲图片
+     * @param resource $img
+     * @param int $level 扭曲级别（0-9），0为不扭曲，建议为验证码字体大小/6
+     */
+    public static function distort($img, $level) 
+    {        
+        $rgb = [];
+        $direct = rand(0, 1);
+        $width  = imagesx($img); 
+        $height = imagesy($img);
+        $offset = mt_rand(3, 8)/10; // 偏移量
+        
+        for($y = 0; $y < $height; $y++) {
+            // 获取像素图点阵像素
+            for($x = 0; $x < $width; $x++) {
+                $rgb[$x] = imagecolorat($img, $x , $y);
+            }
+            // 使用正弦函数水平方向扭曲图片（修改像素点x轴偏移）
+            for($x = 0; $x < $width; $x++) {
+                $r = sin($y / $height * 2 * M_PI - M_PI * $offset) * ($direct ? $level : -$level);
+                imagesetpixel($img, $x + $r , $y , $rgb[$x]);
+            }
+        }
+    }
 }

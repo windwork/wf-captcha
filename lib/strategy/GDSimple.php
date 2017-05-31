@@ -17,7 +17,7 @@ namespace wf\captcha\strategy;
  *      print 'error secode';
  *  }
  * 
- * @package     component.captcha
+ * @package     wf.captcha.strategy
  * @author      cm <cmpan@qq.com>
  */
 class GDSimple implements \wf\captcha\ICaptcha 
@@ -27,10 +27,11 @@ class GDSimple implements \wf\captcha\ICaptcha
         'bgColor'   => [255, 255, 255], // 验证码背景颜色，不使用背景图片时有效
         'color'     => [0x45, 0x45, 0x45], // 验证码背景颜色
         'gradient'  => 32,  // 文字倾斜度范围
-        'fontSize'  => 20,  // 验证码字体大小(px)
+        'fontSize'  => 30,  // 验证码字体大小(px)
         'length'    => 4,   // 验证码位数
         'height'    => 0,   // 验证码图片高，0为根据fontSize自动计算
         'width'     => 0,   // 验证码图片宽，0为根据fontSize自动计算
+        'distortLevel' => 0,// 验证码扭曲级别（0-9），0为不扭曲，如果启用，建议为验证码字体大小/6
         // 验证码中使用的字符，01IO容易混淆，建议不用
         'codeSet'   => '356789ABCDEFGHKLMNPQRSTUVWXY',
         'expire'    => 3000,
@@ -118,6 +119,11 @@ class GDSimple implements \wf\captcha\ICaptcha
         header('Cache-Control: post-check=0, pre-check=0', false);        
         header('Pragma: no-cache');
         header("content-type: image/png");
+        
+        // 扭曲验证码图片
+        if (intval(@$this->cfg['distortLevel']) > 0) {
+            \wf\captcha\Code::distort($this->image, (int)$this->cfg['distortLevel']);
+        }
     
         // 输出验证码图像
         imagepng($this->image); 
