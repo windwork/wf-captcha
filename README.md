@@ -22,7 +22,9 @@ $capt->render($secId);
 ```
 2、验证码对比校验
 ```
-if (!\wf\captcha\Code::check(@$_POST['secode'], 'login')) {
+// 验证码id与生产验证码的id一致
+$secId = 'login';
+if (!\wf\captcha\Code::check(@$_POST['secode'], $secId)) {
      print 'error secode';
 }
 ```
@@ -44,8 +46,9 @@ if (!\wf\captcha\Code::check(@$_POST['secode'], 'login')) {
 ```
 // 可设置配置项及默认值
 
-// GDSimple
+// GDSimple（推荐使用）
 $cfg = [
+    'class'     => 'GDSimple',
     'gradient'  => 32,  // 文字倾斜度范围
     'fontSize'  => 30,  // 验证码字体大小(px)
     'length'    => 4,   // 验证码位数
@@ -58,6 +61,7 @@ $cfg = [
 
 // GDSafety
 $cfg = [
+    'class'     => 'GDSafety',
     'expire'    => 3000,   // 验证码过期时间（s）
     'gradient'  => 20,     // 文字倾斜度范围
     'length'    => 4,      // 验证码位数
@@ -65,6 +69,7 @@ $cfg = [
 
 // GD
 $cfg = [
+    'class'     => 'GD',
     'expire'    => 3000,   // 验证码过期时间（s）
     'useBgImg'  => false,  // 是否使用背景图片 
     'useCurve'  => false,  // 是否画混淆曲线
