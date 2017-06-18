@@ -26,7 +26,7 @@ namespace wf\captcha;
  * @link        http://docs.windwork.org/manual/wf.captcha.html
  * @since       0.1.0
  */
-interface ICaptcha 
+interface CaptchaInterface 
 {
     /**
      * 输出验证码并把在服务器端保存验证码

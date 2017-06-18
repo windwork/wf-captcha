@@ -20,7 +20,7 @@ namespace wf\captcha\strategy;
  * @package     wf.captcha.strategy
  * @author      cm <cmpan@qq.com>
  */
-class GDSimple implements \wf\captcha\ICaptcha 
+class GDSimple implements \wf\captcha\CaptchaInterface 
 {    
     private $cfg = [
         'useBgImg'  => 0,   // 是否使用背景图片

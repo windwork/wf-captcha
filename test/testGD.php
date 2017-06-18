@@ -1,5 +1,5 @@
 <?php
-require_once '../lib/ICaptcha.php';
+require_once '../lib/CaptchaInterface.php';
 require_once '../lib/Exception.php';
 require_once '../lib/Code.php';
 require_once '../lib/strategy/GD.php';

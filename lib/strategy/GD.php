@@ -30,7 +30,7 @@ namespace wf\captcha\strategy;
  * @link        http://docs.windwork.org/manual/wf.captcha.html
  * @since       1.0.0
  */
-class GD implements \wf\captcha\ICaptcha 
+class GD implements \wf\captcha\CaptchaInterface 
 {
     private $cfg = [
         'bg'        => [255, 255, 255], // 验证码背景颜色
@@ -64,7 +64,7 @@ class GD implements \wf\captcha\ICaptcha
     /**
      * 生成验证码
      * {@inheritDoc}
-     * @see \wf\captcha\ICaptcha::render()
+     * @see \wf\captcha\CaptchaInterface::render()
      */
     public function render($id = 'sec') 
     {        

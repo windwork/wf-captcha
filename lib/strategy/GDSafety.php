@@ -23,7 +23,7 @@ namespace wf\captcha\strategy;
  * @link        http://docs.windwork.org/manual/wf.captcha.html
  * @since       0.1.0
  */
-class GDSafety implements \wf\captcha\ICaptcha 
+class GDSafety implements \wf\captcha\CaptchaInterface 
 {    
     private $cfg = [
         'expire'    => 3000,   // 验证码过期时间（s）
@@ -57,7 +57,7 @@ class GDSafety implements \wf\captcha\ICaptcha
     /**
      * 
      * {@inheritDoc}
-     * @see \wf\captcha\ICaptcha::render()
+     * @see \wf\captcha\CaptchaInterface::render()
      */
     public function render($id = 'sec') 
     {    
