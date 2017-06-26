@@ -10,13 +10,13 @@
 1、生成验证码图片
 ```
 $cfg = [
-    'class'     => '\wf\captcha\strategy\GDSimple',
     'gradient'  => 32,  // 文字倾斜度范围
     'fontSize'  => 30,  // 验证码字体大小(px)
     'length'    => 4,   // 验证码位数
     'distortLevel' => 0,// 验证码扭曲级别（0-9），0为不扭曲，如果启用，建议为验证码字体大小/6
 ];
-$capt = \wfCaptcha($cfg); // new \wf\captcha\strategy\GDSimple($cfg);
+
+$capt = new \wf\captcha\strategy\GDSimple($cfg);
 $secId = 'login';
 $capt->render($secId);
 
@@ -46,50 +46,68 @@ if (!\wf\captcha\Code::check(@$_POST['secode'], $secId)) {
 ## 配置选项
 
 ```
-// 可设置配置项及默认值
+// 在 config/app.php 设置验证码组件参数
 
 // GDSimple（推荐使用）
-$cfg = [
-    'class'     => '\wf\captcha\strategy\GDSimple',
-    'gradient'  => 32,  // 文字倾斜度范围
-    'fontSize'  => 30,  // 验证码字体大小(px)
-    'length'    => 4,   // 验证码位数
-    'distortLevel' => 0,// 验证码扭曲级别（0-9），0为不扭曲，如果启用，建议为验证码字体大小/6
-    // 验证码中使用的字符，01IO容易混淆，建议不用
-    'codeSet'   => '356789ABCDEFGHKLMNPQRSTUVWXY',
-    'expire'    => 3000,
+return [
+    'srv' => [
+        'captcha' => [
+		    'class'     => '\wf\captcha\strategy\GDSimple',
+		    'gradient'  => 32,  // 文字倾斜度范围
+		    'fontSize'  => 30,  // 验证码字体大小(px)
+		    'length'    => 4,   // 验证码位数
+		    'distortLevel' => 0,// 验证码扭曲级别（0-9），0为不扭曲，如果启用，建议为验证码字体大小/6
+		    // 验证码中使用的字符，01IO容易混淆，建议不用
+		    'codeSet'   => '356789ABCDEFGHKLMNPQRSTUVWXY',
+		    'expire'    => 3000,
+		]
+    ]
 ];
 
 
 // GDSafety
-$cfg = [
-    'class'     => '\wf\captcha\strategy\GDSafety',
-    'expire'    => 3000,   // 验证码过期时间（s）
-    'gradient'  => 20,     // 文字倾斜度范围
-    'length'    => 4,      // 验证码位数
+return [
+    'srv' => [
+        'captcha' => [
+		    'class'     => '\wf\captcha\strategy\GDSafety',
+		    'expire'    => 3000,   // 验证码过期时间（s）
+		    'gradient'  => 20,     // 文字倾斜度范围
+		    'length'    => 4,      // 验证码位数
+		]
+    ]
 ];
+
 
 // GD
-$cfg = [
-    'class'     => '\wf\captcha\strategy\GD',
-    'expire'    => 3000,   // 验证码过期时间（s）
-    'useBgImg'  => false,  // 是否使用背景图片 
-    'useCurve'  => false,  // 是否画混淆曲线
-    'useNoise'  => true,  // 是否添加杂点    
-    'gradient'  => 22,     // 文字倾斜度范围
-    'fontSize'  => 30,     // 验证码字体大小(px)
-    'height'    => 0,      // 验证码图片高，0为根据fontSize自动计算
-    'width'     => 0,      // 验证码图片宽，0为根据fontSize自动计算
-    'length'    => 4,      // 验证码位数
-    'distortLevel' => 5,   // 验证码扭曲级别（0-9），0为不扭曲，如果启用，建议为验证码字体大小/6
+return [
+    'srv' => [
+        'captcha' => [
+		    'class'     => '\wf\captcha\strategy\GD',
+		    'expire'    => 3000,   // 验证码过期时间（s）
+		    'useBgImg'  => false,  // 是否使用背景图片 
+		    'useCurve'  => false,  // 是否画混淆曲线
+		    'useNoise'  => true,  // 是否添加杂点    
+		    'gradient'  => 22,     // 文字倾斜度范围
+		    'fontSize'  => 30,     // 验证码字体大小(px)
+		    'height'    => 0,      // 验证码图片高，0为根据fontSize自动计算
+		    'width'     => 0,      // 验证码图片宽，0为根据fontSize自动计算
+		    'length'    => 4,      // 验证码位数
+		    'distortLevel' => 5,   // 验证码扭曲级别（0-9），0为不扭曲，如果启用，建议为验证码字体大小/6
+		
+		    // 验证码背景颜色
+		    'bg'        => [243, 251, 254], 
+		
+		    // 验证码选择使用的字体列表，字体放在 ./assets/ttfs/ 文件夹
+		    'ttfs'      => ['1.ttf'],  
+		
+		    // 验证码选择使用的背景图片列表，图片放在 ./assets/bgs/ 文件夹
+		    'bgs'       => ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg'], 
 
-    // 验证码背景颜色
-    'bg'        => [243, 251, 254], 
-
-    // 验证码选择使用的字体列表，字体放在 ./assets/ttfs/ 文件夹
-    'ttfs'      => ['1.ttf'],  
-
-    // 验证码选择使用的背景图片列表，图片放在 ./assets/bgs/ 文件夹
-    'bgs'       => ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg'], 
+		]
+    ]
 ];
+
+// 创建实例
+$capt = wfCaptcha(); // new {$cfg['srv']['captcha']['class']}($cfg['srv']['captcha'])
+
 ```
