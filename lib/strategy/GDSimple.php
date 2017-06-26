@@ -9,11 +9,11 @@ namespace wf\captcha\strategy;
  * 可配置的属性都是一些简单直观的变量，我就不用弄一堆的setter/getter了
  * 
  * useage:
- * $capt = new \component\captcha\Captcha($cfg);
+ * $capt = \wf\captcha\strategy\GDSimple($cfg);
  * $capt->entry();
  * 
  *  验证码对比校验
- *  if (!\component\captcha\Captcha::check(@$_POST['secode'], $id)) {
+ *  if (!\wf\captcha\Captcha::check(@$_POST['secode'], $id)) {
  *      print 'error secode';
  *  }
  * 
@@ -44,19 +44,16 @@ class GDSimple implements \wf\captcha\CaptchaInterface
     
     /**
      * 验证码图片实例
-     * @var \component\captcha\Captcha
+     * @var function imagecreate
      */
-    private $image   = null;
+    private $image = null;
     
     /**
      * 验证码字体颜色
-     * @var array
+     * @var function imagecolorallocate
      */
-    private $color   = null;
-
-    /**
-     * 生成验证码
-     */
+    private $color = null;
+    
     public function render($id = 'sec') 
     {        
         // 图片宽(px)
@@ -77,11 +74,13 @@ class GDSimple implements \wf\captcha\CaptchaInterface
             // 建立一幅 $this->cfg['width'] x $this->cfg['height'] 的图像
             $this->image = imagecreate($this->cfg['width'], $this->cfg['height']);
             
-            imagecolorallocate($this->image, $this->cfg['bgColor'][0], $this->cfg['bgColor'][1], $this->cfg['bgColor'][2]); 
+            imagecolorallocate($this->image, $this->cfg['bgColor'][0], 
+                $this->cfg['bgColor'][1], $this->cfg['bgColor'][2]); 
         }
                 
         // 验证码文字颜色
-        $this->color = imagecolorallocate($this->image, $this->cfg['color'][0], $this->cfg['color'][1], $this->cfg['color'][2]);
+        $this->color = imagecolorallocate($this->image, $this->cfg['color'][0], 
+            $this->cfg['color'][1], $this->cfg['color'][2]);
         
         // 验证码使用随机字体
         $ttf = dirname(dirname(__DIR__)) . '/assets/gd_simple/code.ttf';    
@@ -98,7 +97,8 @@ class GDSimple implements \wf\captcha\CaptchaInterface
             } elseif ($i > 0 && in_array($code[$i-1], ['B', 'G', 'H', 'N'])) {
                 // 较宽易混淆的字符
                 $codeNX += $this->cfg['fontSize']*0.7;
-            } elseif ($i > 0 && (is_numeric($code[$i-1]) || in_array($code[$i-1], [6, 7, 9, 'A', 'C', 'F', 'L', 'P', 'T', 'V']))) {
+            } elseif ($i > 0 && (is_numeric($code[$i-1]) 
+                || in_array($code[$i-1], [6, 7, 9, 'A', 'C', 'F', 'L', 'P', 'T', 'V']))) {
                 // 不易混淆的字符 679ACFLPTV
                 $codeNX += $this->cfg['fontSize']*0.5;
             } else {
@@ -109,7 +109,8 @@ class GDSimple implements \wf\captcha\CaptchaInterface
             $gradient = mt_rand(-$this->cfg['gradient'], $this->cfg['gradient']);
             
             // 写一个验证码字符
-            imagettftext($this->image, $this->cfg['fontSize'], $gradient, $codeNX, $this->cfg['fontSize']*1.1, $this->color/*imagecolorallocate($this->image, mt_rand(1,130), mt_rand(1,130), mt_rand(1,130))*/, $ttf, $code[$i]);
+            imagettftext($this->image, $this->cfg['fontSize'], $gradient, 
+                $codeNX, $this->cfg['fontSize']*1.1, $this->color, $ttf, $code[$i]);
         }
         
         // 保存验证码

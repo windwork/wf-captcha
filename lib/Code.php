@@ -10,17 +10,17 @@
 namespace wf\captcha;
 
 /**
- * 验证码存储及检查
+ * 验证码存储、检查、扭曲
  */
 class Code 
 {
     const SESS_KEY = '@captcha_sk';
     
     /**
-     * 验证验证码是否正确
+     * 检测验证码是否正确
      *
      * @param string $code 用户验证码
-     * @param string $id 下标
+     * @param string $id = 'sec' 下标
      * @return bool 用户验证码是否正确
      */
     public static function check($code, $id = 'sec') 
@@ -54,9 +54,10 @@ class Code
     
     /**
      * 保存最新验证码信息
+     * 
      * @param string $code 验证码字符串
      * @param int $expire  验证码过期时间戳
-     * @param string $id = ''
+     * @param string $id = 'sec'
      */
     public static function save($code, $expire, $id = 'sec') 
     {
@@ -70,7 +71,8 @@ class Code
     }
     
     /**
-     * 水平扭曲图片
+     * 水平扭曲验证码图片
+     * 
      * @param resource $img
      * @param int $level 扭曲级别（0-9），0为不扭曲，建议为验证码字体大小/6
      */

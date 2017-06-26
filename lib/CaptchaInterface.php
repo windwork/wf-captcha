@@ -13,11 +13,11 @@ namespace wf\captcha;
  * 验证码接口
  * 
  * useage:
- * $capt = app()->getDi()->captcha();
+ * $capt = wfCaptcha(); // 
  * $capt->render();
  * 
  *  验证码对比校验
- *  if (!app()->getDi()->captcha()->check(@$_POST['secode'])) {
+ *  if (!\wf\captcha\Code::check(@$_POST['secode'])) {
  *      print 'error secode';
  *  }
  *  
@@ -29,7 +29,7 @@ namespace wf\captcha;
 interface CaptchaInterface 
 {
     /**
-     * 输出验证码并把在服务器端保存验证码
+     * 生成验证码，输出为图片格式，并保存验证码字符到session
      *  
      * @param string $id = 'sec' 验证码类别，如登录）login；注册）regster
      */

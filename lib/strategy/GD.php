@@ -16,8 +16,7 @@ namespace wf\captcha\strategy;
  * 可配置的属性都是一些简单直观的变量，我就不用弄一堆的setter/getter了
  * 
  * useage:
- * $capt = \wf\Factory::captcha();
- * $capt->setCfg($cfg);
+ * $capt = \wf\captcha\strategy\GD($cfg);
  * $capt->entry();
  * 
  *  验证码对比校验
@@ -58,11 +57,20 @@ class GD implements \wf\captcha\CaptchaInterface
      * @var string
      */
     private $codeSet = '3456789AbcDEFHKLMNPQRSTUVWXY';
-    private $image   = null;     // 验证码图片实例
-    private $color   = null;     // 验证码字体颜色
+    
+    /**
+     * 验证码图片实例
+     * @var function imagecreate
+     */
+    private $image = null;
+    
+    /**
+     * 验证码字体颜色
+     * @var function imagecolorallocate
+     */
+    private $color = null;
 
     /**
-     * 生成验证码
      * {@inheritDoc}
      * @see \wf\captcha\CaptchaInterface::render()
      */
@@ -103,7 +111,9 @@ class GD implements \wf\captcha\CaptchaInterface
             $gradient = mt_rand(-$this->cfg['gradient'], $this->cfg['gradient']);    
             
             // 写一个验证码字符
-            imagettftext($this->image, $this->cfg['fontSize'], $gradient, $codeNX, mt_rand($this->cfg['fontSize']*1.25, $this->cfg['fontSize']*1.36), $this->color/*imagecolorallocate($this->image, mt_rand(1,130), mt_rand(1,130), mt_rand(1,130))*/, $ttf, $code[$i]);
+            imagettftext($this->image, $this->cfg['fontSize'], $gradient, $codeNX, 
+                mt_rand($this->cfg['fontSize']*1.25, $this->cfg['fontSize']*1.36), 
+                $this->color, $ttf, $code[$i]);
         }
         
         // 保存验证码

@@ -10,16 +10,18 @@
 1、生成验证码图片
 ```
 $cfg = [
+    'class'     => '\wf\captcha\strategy\GDSimple',
     'gradient'  => 32,  // 文字倾斜度范围
     'fontSize'  => 30,  // 验证码字体大小(px)
     'length'    => 4,   // 验证码位数
     'distortLevel' => 0,// 验证码扭曲级别（0-9），0为不扭曲，如果启用，建议为验证码字体大小/6
 ];
-$capt = new \wf\captcha\strategy\GDSimple($cfg);
+$capt = \wfCaptcha($cfg); // new \wf\captcha\strategy\GDSimple($cfg);
 $secId = 'login';
 $capt->render($secId);
 
 ```
+
 2、验证码对比校验
 ```
 // 验证码id与生产验证码的id一致
@@ -48,7 +50,7 @@ if (!\wf\captcha\Code::check(@$_POST['secode'], $secId)) {
 
 // GDSimple（推荐使用）
 $cfg = [
-    'class'     => 'GDSimple',
+    'class'     => '\wf\captcha\strategy\GDSimple',
     'gradient'  => 32,  // 文字倾斜度范围
     'fontSize'  => 30,  // 验证码字体大小(px)
     'length'    => 4,   // 验证码位数
@@ -61,7 +63,7 @@ $cfg = [
 
 // GDSafety
 $cfg = [
-    'class'     => 'GDSafety',
+    'class'     => '\wf\captcha\strategy\GDSafety',
     'expire'    => 3000,   // 验证码过期时间（s）
     'gradient'  => 20,     // 文字倾斜度范围
     'length'    => 4,      // 验证码位数
@@ -69,7 +71,7 @@ $cfg = [
 
 // GD
 $cfg = [
-    'class'     => 'GD',
+    'class'     => '\wf\captcha\strategy\GD',
     'expire'    => 3000,   // 验证码过期时间（s）
     'useBgImg'  => false,  // 是否使用背景图片 
     'useCurve'  => false,  // 是否画混淆曲线
