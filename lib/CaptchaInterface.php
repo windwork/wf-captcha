@@ -12,7 +12,7 @@ namespace wf\captcha;
 /**
  * 验证码接口
  * 
- * useage:
+ * usage:
  * $capt = wfCaptcha(); // 
  * $capt->render();
  * 
