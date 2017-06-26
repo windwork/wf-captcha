@@ -8,7 +8,7 @@ namespace wf\captcha\strategy;
  * 安全的验证码要：验证码文字旋转，使用不同字体，可加干扰码、可加干扰线、可使用中文、可使用背景图片
  * 可配置的属性都是一些简单直观的变量，我就不用弄一堆的setter/getter了
  * 
- * useage:
+ * usage:
  * $capt = \wf\captcha\strategy\GDSimple($cfg);
  * $capt->entry();
  * 
