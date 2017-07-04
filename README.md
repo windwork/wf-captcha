@@ -1,10 +1,21 @@
 验证码组件
 =============
-安全可靠的验证码，拥有强大的反机器识别能力，同时又不失人眼阅读体验。
+安全可靠的验证码，拥有很强的反机器识别能力，同时又不失人眼阅读体验。
 
 ## require
  - php 5.5+
  - GD2
+
+## 安装
+该组件已包含在Windwork框架中，如果你已安装Windwork框架则可以直接使用。
+
+- 安装方式一：通过composer安装（推荐）
+```
+composer require windwork/wf
+```
+
+- 安装方式二：传统方式安装
+[下载源码](https://github.com/windwork/wf/releases)后，解压源码到项目文件夹中，然后require_once $PATH_TO_WF/core/lib/Loader.php文件，即可自动加载组件中的类。
 
 ## 使用示例
 1、生成验证码图片
