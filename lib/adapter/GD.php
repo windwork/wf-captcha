@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2008-2017 Windwork Team. (http://www.windwork.org)
  * @license   http://opensource.org/licenses/MIT
  */
-namespace wf\captcha\strategy;
+namespace wf\captcha\adapter;
 
 /**
  * 验证码(GD库实现)
@@ -16,7 +16,7 @@ namespace wf\captcha\strategy;
  * 可配置的属性都是一些简单直观的变量，我就不用弄一堆的setter/getter了
  * 
  * usage:
- * $capt = \wf\captcha\strategy\GD($cfg);
+ * $capt = \wf\captcha\adapter\GD($cfg);
  * $capt->entry();
  * 
  *  验证码对比校验
@@ -24,7 +24,7 @@ namespace wf\captcha\strategy;
  *      print 'error secode';
  *  }
  * 
- * @package     wf.captcha.strategy
+ * @package     wf.captcha.adapter
  * @author      cmm <cmm@windwork.org>
  * @link        http://docs.windwork.org/manual/wf.captcha.html
  * @since       1.0.0

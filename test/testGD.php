@@ -2,9 +2,9 @@
 require_once '../lib/CaptchaInterface.php';
 require_once '../lib/Exception.php';
 require_once '../lib/Code.php';
-require_once '../lib/strategy/GD.php';
+require_once '../lib/adapter/GD.php';
 
-$capt = new \wf\captcha\strategy\GD();
+$capt = new \wf\captcha\adapter\GD();
 $capt->render('login');
 
 // 验证码对比校验

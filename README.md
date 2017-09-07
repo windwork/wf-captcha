@@ -27,7 +27,7 @@ $cfg = [
     'distortLevel' => 0,// 验证码扭曲级别（0-9），0为不扭曲，如果启用，建议为验证码字体大小/6
 ];
 
-$capt = new \wf\captcha\strategy\GDSimple($cfg);
+$capt = new \wf\captcha\adapter\GDSimple($cfg);
 $secId = 'login';
 $capt->render($secId);
 
@@ -63,7 +63,7 @@ if (!\wf\captcha\Code::check(@$_POST['secode'], $secId)) {
 return [
     'srv' => [
         'captcha' => [
-		    'class'     => '\wf\captcha\strategy\GDSimple',
+		    'class'     => '\wf\captcha\adapter\GDSimple',
 		    'gradient'  => 32,  // 文字倾斜度范围
 		    'fontSize'  => 30,  // 验证码字体大小(px)
 		    'length'    => 4,   // 验证码位数
@@ -80,7 +80,7 @@ return [
 return [
     'srv' => [
         'captcha' => [
-		    'class'     => '\wf\captcha\strategy\GDSafety',
+		    'class'     => '\wf\captcha\adapter\GDSafety',
 		    'expire'    => 3000,   // 验证码过期时间（s）
 		    'gradient'  => 20,     // 文字倾斜度范围
 		    'length'    => 4,      // 验证码位数
@@ -93,7 +93,7 @@ return [
 return [
     'srv' => [
         'captcha' => [
-		    'class'     => '\wf\captcha\strategy\GD',
+		    'class'     => '\wf\captcha\adapter\GD',
 		    'expire'    => 3000,   // 验证码过期时间（s）
 		    'useBgImg'  => false,  // 是否使用背景图片 
 		    'useCurve'  => false,  // 是否画混淆曲线

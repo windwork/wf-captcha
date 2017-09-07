@@ -1,6 +1,6 @@
 <?php
 
-namespace wf\captcha\strategy;
+namespace wf\captcha\adapter;
 
 /**
  * 验证码(GD库实现)
@@ -9,7 +9,7 @@ namespace wf\captcha\strategy;
  * 可配置的属性都是一些简单直观的变量，我就不用弄一堆的setter/getter了
  * 
  * usage:
- * $capt = \wf\captcha\strategy\GDSimple($cfg);
+ * $capt = \wf\captcha\adapter\GDSimple($cfg);
  * $capt->entry();
  * 
  *  验证码对比校验
@@ -17,7 +17,7 @@ namespace wf\captcha\strategy;
  *      print 'error secode';
  *  }
  * 
- * @package     wf.captcha.strategy
+ * @package     wf.captcha.adapter
  * @author      cm <cmpan@qq.com>
  */
 class GDSimple implements \wf\captcha\CaptchaInterface 
