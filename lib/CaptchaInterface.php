@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2008-2017 Windwork Team. (http://www.windwork.org)
  * @license   http://opensource.org/licenses/MIT
  */
-namespace wf\Captcha;
+namespace wf\captcha;
 
 /**
  *

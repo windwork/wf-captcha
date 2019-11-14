@@ -21,7 +21,7 @@ composer require windwork/captcha
 
 require_once 'vendor/autoload.php';
 
-$capt = new \wf\Captcha\Captcha([
+$capt = new \wf\captcha\captcha([
     'useBgImg'    => false,  // 是否使用背景图片
     'useNoise'    => false,  // 是否添加干扰字符
     'curve'       => 1,      // 画混淆曲线数量

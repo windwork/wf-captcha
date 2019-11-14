@@ -2,7 +2,7 @@
 require_once '../lib/CaptchaInterface.php';
 require_once '../lib/Captcha.php';
 
-$capt = new \wf\Captcha\Captcha([
+$capt = new \wf\captcha\captcha([
     'useBgImg'    => false,  // 是否使用背景图片
     'useNoise'    => false,  // 是否添加干扰字符
     'curve'       => 1,      // 画混淆曲线数量
