@@ -5,8 +5,8 @@
 		"captcha",
 		"anti robot"
 	],
-	"version" : "1.0.0",
-	"time" : "2019-11-14 13:00:00",
+	"version" : "1.0.1",
+	"time" : "2019-11-14 16:00:00",
 	"require" : {
 		"php" : ">=5.5",
 		"ext-gd" : "*"
