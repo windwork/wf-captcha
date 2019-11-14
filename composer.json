@@ -5,10 +5,10 @@
 		"captcha",
 		"anti robot"
 	],
-	"version" : "0.7.0",
-	"time" : "2017-06-26 16:10:00",
+	"version" : "1.0.0",
+	"time" : "2019-11-14 13:00:00",
 	"require" : {
-		"php" : ">=5.5.0",
+		"php" : ">=5.5",
 		"ext-gd" : "*"
 	},
 	"license" : "MIT",

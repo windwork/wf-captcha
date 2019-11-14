@@ -7,32 +7,33 @@
  * @copyright Copyright (c) 2008-2017 Windwork Team. (http://www.windwork.org)
  * @license   http://opensource.org/licenses/MIT
  */
-namespace wf\captcha;
+namespace wf\Captcha;
 
 /**
- * 验证码接口
- * 
- * usage:
- * $capt = wfCaptcha(); // 
- * $capt->render();
- * 
- *  验证码对比校验
- *  if (!\wf\captcha\Code::check(@$_POST['secode'])) {
- *      print 'error secode';
- *  }
- *  
+ *
  * @package     wf.captcha
  * @author      cm <cmpan@qq.com>
  * @link        http://docs.windwork.org/manual/wf.captcha.html
- * @since       0.1.0
+ * @since       1.0
  */
 interface CaptchaInterface 
 {
+    public function getPhrase();
+
     /**
-     * 生成验证码，输出为图片格式，并保存验证码字符到session
-     *  
-     * @param string $id = 'sec' 验证码类别，如登录）login；注册）regster
+     * out put captcha image
+     *
+     * @param int $quality
+     * @return mixed
      */
-    public function render($id = 'sec');
+    public function output($quality = 90);
+
+    /**
+     * get image content
+     *
+     * @param int $quality
+     * @return mixed
+     */
+    public function get($quality = 90);
 }
 
