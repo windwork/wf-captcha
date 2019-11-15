@@ -5,7 +5,7 @@
 		"captcha",
 		"anti robot"
 	],
-	"version" : "1.0.1",
+	"version" : "1.0.2",
 	"time" : "2019-11-14 16:00:00",
 	"require" : {
 		"php" : ">=5.5",

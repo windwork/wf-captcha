@@ -1,9 +1,9 @@
 <?php
 /**
  * Windwork
- * 
+ *
  * 一个用于快速开发高并发Web应用的轻量级PHP框架
- * 
+ *
  * @copyright Copyright (c) 2008-2017 Windwork Team. (http://www.windwork.org)
  * @license   http://opensource.org/licenses/MIT
  */
@@ -11,19 +11,19 @@ namespace wf\captcha;
 
 /**
  * 验证码(GD库实现)
- * 
+ *
  * 安全的验证码要：验证码文字旋转，使用不同字体，可加干扰码、可加干扰线、可使用中文、可使用背景图片
  * 可配置的属性都是一些简单直观的变量，我就不用弄一堆的setter/getter了
- * 
+ *
  * usage:
  * $capt = \wf\captcha\adapter\GD($cfg);
  * $capt->entry();
- * 
+ *
  *  验证码对比校验
  *  if (!\wf\captcha\Code::check(@$_POST['secode'], $id)) {
  *      print 'error secode';
  *  }
- * 
+ *
  * @package     wf.captcha.adapter
  * @author      cmm <cmm@windwork.org>
  * @link        http://docs.windwork.org/manual/wf.captcha.html
@@ -59,13 +59,13 @@ class Captcha implements CaptchaInterface
      * @var string
      */
     private $phraseSet = '356789ABCDEFGHKLMNPQRSTUVWXY';
-    
+
     /**
      * 验证码图片实例
      * @var function imagecreate
      */
     private $image = null;
-    
+
     /**
      * 验证码字体颜色
      * @var function imagecolorallocate
@@ -74,6 +74,17 @@ class Captcha implements CaptchaInterface
 
     private $phrase = '';
 
+    /**
+     * Captcha constructor.
+     * @param array $cfg = <pre> [
+     *   'useBgImg'    => false,  // 是否使用背景图片
+     *   'useNoise'    => false,  // 是否添加干扰字符
+     *   'curve'       => 1,      // 画混淆曲线数量
+     *   'distort'     => 0,      // 扭曲级别（0-9），0为不扭曲，建议为验证码字体大小/6
+     *   'length'      => 4,      // 验证码位数
+     *   'fontSize'    => 36,     // 验证码字体大小(px)
+     * ]; </pre>
+     */
     public function __construct(array $cfg = [])
     {
         $this->cfg = array_replace_recursive($this->cfg, $cfg);
@@ -190,10 +201,10 @@ class Captcha implements CaptchaInterface
         $this->phrase = implode('', $phrase);
     }
 
-    
-    /** 
-     * 画一条由两条连在一起构成的随机正弦函数曲线作干扰线(你可以改成更帅的曲线函数) 
-     *      
+
+    /**
+     * 画一条由两条连在一起构成的随机正弦函数曲线作干扰线(你可以改成更帅的曲线函数)
+     *
      *      高中的数学公式咋都忘了涅，写出来
      *        正弦型函数解析式：y=Asin(ωx+φ)+b
      *      各常数值对函数图像的影响：
@@ -205,15 +216,15 @@ class Captcha implements CaptchaInterface
      * （^_^）看到这里如果觉得有盗版嫌疑，可以搜索一下十多年前的代码，看看到底是谁盗版谁
      */
     protected function curve()
-    {        
+    {
         $px = $py = 0;
-        
+
         $A = mt_rand(- $this->height / 2, $this->height / 2);   // 振幅
         $b = mt_rand(- $this->height / 4, $this->height / 4);   // Y轴方向偏移量
         $f = mt_rand(- $this->width / 4, $this->width / 4);     // X轴方向偏移量
-        $T = mt_rand($this->width / 2, $this->width);      // 周期
+        $T = mt_rand($this->width, $this->width * 2);      // 周期
         $w = (2* M_PI)/$T;
-                        
+
         $px1 = mt_rand(0, $this->width/4);  // 曲线横坐标起始位置
         $px2 = mt_rand($px1 + $this->width/3, $this->width);  // 曲线横坐标结束位置
 
@@ -221,7 +232,7 @@ class Captcha implements CaptchaInterface
             if ($w == 0) {
                 break;
             }
-            
+
             $py = $A * sin($w*$px + $f)+ $b + $this->height/2;  // y = Asin(ωx+φ) + b
             $i = max(2, intval($this->cfg['fontSize']/10));
             while ($i > 0) {
@@ -230,7 +241,7 @@ class Captcha implements CaptchaInterface
             }
         }
     }
-    
+
     /**
      * 画杂点
      * 往图片上写不同颜色的字母或数字
@@ -240,14 +251,14 @@ class Captcha implements CaptchaInterface
         for($i = 0; $i < $this->cfg['fontSize']/4; $i++){
             //杂点颜色
             $noiseColor = imagecolorallocate($this->image, mt_rand(100, 255), mt_rand(100, 255), mt_rand(100, 255));
-            
+
             for ($j = 0; $j < 4; $j++) {
                 // 绘杂点
                 imagestring($this->image, 5, mt_rand(-10, $this->width), mt_rand(-10, $this->height), $this->phraseSet[mt_rand(0, 25)], $noiseColor);
-            }            
+            }
         }
     }
-    
+
     /**
      * 绘制背景图片
      */
@@ -296,6 +307,3 @@ class Captcha implements CaptchaInterface
         }
     }
 }
-
-
-
