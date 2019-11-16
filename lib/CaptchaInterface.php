@@ -21,6 +21,12 @@ interface CaptchaInterface
     public function create();
 
     /**
+     * @param int $level
+     * @return CaptchaInterface
+     */
+    public function setLevel(int $level);
+
+    /**
      * @return string
      */
     public function getPhrase();

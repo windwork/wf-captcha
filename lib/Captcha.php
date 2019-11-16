@@ -86,6 +86,7 @@ class Captcha implements CaptchaInterface
 
     /**
      * @param int $level
+     * @return CaptchaInterface
      */
     public function setLevel(int $level) {
         switch ($level) {
@@ -112,6 +113,8 @@ class Captcha implements CaptchaInterface
             default :
                 break;
         }
+
+        return $this;
     }
 
     public function output($quality = 90)
@@ -144,7 +147,7 @@ class Captcha implements CaptchaInterface
     public function create()
     {
         // 图片宽(px)
-        $this->width = $this->cfg['length'] * $this->cfg['fontSize'] * 0.8;
+        $this->width = $this->cfg['length'] * $this->cfg['fontSize'] * 0.85;
 
         // 图片高(px)
         $this->height = $this->cfg['fontSize'] * 1.36;
