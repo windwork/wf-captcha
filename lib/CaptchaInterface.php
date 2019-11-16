@@ -18,6 +18,11 @@ namespace wf\captcha;
  */
 interface CaptchaInterface 
 {
+    public function create();
+
+    /**
+     * @return string
+     */
     public function getPhrase();
 
     /**
