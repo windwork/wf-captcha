@@ -15,29 +15,25 @@ namespace wf\captcha;
  * 安全的验证码要：验证码文字旋转，使用不同字体，可加干扰码、可加干扰线、可使用中文、可使用背景图片
  * 可配置的属性都是一些简单直观的变量，我就不用弄一堆的setter/getter了
  *
- * usage:
- * $capt = \wf\captcha\adapter\GD($cfg);
- * $capt->entry();
- *
- *  验证码对比校验
- *  if (!\wf\captcha\Code::check(@$_POST['secode'], $id)) {
- *      print 'error secode';
- *  }
- *
- * @package     wf.captcha.adapter
+ * @package     wf.captcha
  * @author      cmm <cmm@windwork.org>
  * @link        http://docs.windwork.org/manual/wf.captcha.html
  * @since       1.0.0
  */
 class Captcha implements CaptchaInterface
 {
-    private $cfg = [
-        'useBgImg'    => false,  // 是否使用背景图片
-        'useNoise'    => false,  // 是否添加干扰字符
-        'curve'       => 1,      // 画混淆曲线数量
-        'distort'     => 0,      // 扭曲级别（0-9），0为不扭曲，建议为验证码字体大小/6
-        'length'      => 4,      // 验证码位数
-        'fontSize'    => 36,     // 验证码字体大小(px)
+    const LEVEL_LOW = 1;
+    const LEVEL_NORMAL = 2;
+    const LEVEL_HEIGHT = 3;
+    const LEVEL_VERY_HEIGHT = 4;
+
+    protected $cfg = [
+        'curve'     => 2,      // 画混淆曲线数量
+        'distort'   => 3,      // 扭曲级别（0-9），0为不扭曲，建议为验证码字体大小/6
+        'length'    => 4,      // 验证码位数
+        'fontSize'  => 36,     // 验证码字体大小(px)
+        'bgColor'   => [255, 255, 255],
+        'color'     => [0, 0, 0],
     ];
 
     /**
@@ -58,29 +54,27 @@ class Captcha implements CaptchaInterface
      *
      * @var string
      */
-    private $phraseSet = '356789ABCDEFGHKLMNPQRSTUVWXY';
+    protected $phraseSet = '356789ABCDEFGHKLMNPQRSTUVWXY';
 
     /**
      * 验证码图片实例
      * @var function imagecreate
      */
-    private $image = null;
+    protected $image = null;
 
     /**
      * 验证码字体颜色
      * @var function imagecolorallocate
      */
-    private $color = null;
+    protected $color = null;
 
     private $phrase = '';
 
     /**
      * Captcha constructor.
      * @param array $cfg = <pre> [
-     *   'useBgImg'    => false,  // 是否使用背景图片
-     *   'useNoise'    => false,  // 是否添加干扰字符
-     *   'curve'       => 1,      // 画混淆曲线数量
-     *   'distort'     => 0,      // 扭曲级别（0-9），0为不扭曲，建议为验证码字体大小/6
+     *   'curve'       => 2,      // 画混淆曲线数量
+     *   'distort'     => 3,      // 扭曲级别（0-9），0为不扭曲，建议为验证码字体大小/6
      *   'length'      => 4,      // 验证码位数
      *   'fontSize'    => 36,     // 验证码字体大小(px)
      * ]; </pre>
@@ -88,19 +82,36 @@ class Captcha implements CaptchaInterface
     public function __construct(array $cfg = [])
     {
         $this->cfg = array_replace_recursive($this->cfg, $cfg);
-
-        // 图片宽(px)
-        $this->width = $this->cfg['length'] * $this->cfg['fontSize']*0.9;
-
-        // 图片高(px)
-        $this->height = $this->cfg['fontSize'] * 1.36;
-
-        $this->build();
     }
 
-    public function getPhrase()
-    {
-        return $this->phrase;
+    /**
+     * @param int $level
+     */
+    public function setLevel(int $level) {
+        switch ($level) {
+            case static::LEVEL_LOW:
+                $this->cfg['curve'] = 1;
+                $this->cfg['distort'] = 0;
+                $this->cfg['length'] = 4;
+                break;
+            case static::LEVEL_NORMAL:
+                $this->cfg['curve'] = 2;
+                $this->cfg['distort'] = 2;
+                $this->cfg['length'] = 4;
+                break;
+            case static::LEVEL_HEIGHT:
+                $this->cfg['curve'] = 2;
+                $this->cfg['distort'] = 4;
+                $this->cfg['length'] = 5;
+                break;
+            case static::LEVEL_VERY_HEIGHT:
+                $this->cfg['curve'] = 3;
+                $this->cfg['distort'] = 5;
+                $this->cfg['length'] = 6;
+                break;
+            default :
+                break;
+        }
     }
 
     public function output($quality = 90)
@@ -125,36 +136,32 @@ class Captcha implements CaptchaInterface
         return ob_get_clean();
     }
 
-    protected function build($id = 'sec')
+    public function getPhrase()
     {
+        return $this->phrase;
+    }
 
-        if ($this->cfg['useBgImg']) {
-            // 使用图片背景
-            // 建立一幅 $this->width x $this->height 的图像
-            $this->image = imagecreatetruecolor($this->width, $this->height);
+    public function create()
+    {
+        // 图片宽(px)
+        $this->width = $this->cfg['length'] * $this->cfg['fontSize'] * 0.8;
 
-            $this->bgImg();
-        } else {
-            // 使用纯色背景
-            // 建立一幅 $this->width x $this->height 的图像
-            $this->image = imagecreate($this->width, $this->height);
+        // 图片高(px)
+        $this->height = $this->cfg['fontSize'] * 1.36;
 
-            imagecolorallocate($this->image, mt_rand(120, 255), mt_rand(120, 255), mt_rand(120, 255));
+        // 建立一幅 $this->width x $this->height 的图像
+        $this->image = imagecreate($this->width, $this->height);
 
-            if ($this->cfg['useNoise']) {
-                $this->noise(); // 绘杂点
-            }
-        }
+        imagecolorallocate($this->image, $this->cfg['bgColor'][0], $this->cfg['bgColor'][1], $this->cfg['bgColor'][2]);
 
         // 验证码字体随机颜色
-        $this->color = imagecolorallocate($this->image, mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100));
+        $this->color = imagecolorallocate($this->image, $this->cfg['color'][0], $this->cfg['color'][1], $this->cfg['color'][2]);
 
+        $this->phrase();
 
         for ($i = 0; $i < $this->cfg['curve']; $i++) {
             $this->curve(); // 绘干扰线
         }
-
-        $this->phrase();
 
         if ($this->cfg['distort']) {
             $this->distort(); // 扭曲验证码
@@ -176,22 +183,17 @@ class Captcha implements CaptchaInterface
 
         for ($i = 0; $i<$this->cfg['length']; $i++) {
             $phrase[$i] = $this->phraseSet[mt_rand(0, strlen($this->phraseSet)-1)];
-            if ($i > 0 && in_array($phrase[$i-1], ['M', 'W'])) {
+            if ($i > 0 && in_array($phrase[$i-1], ['I', 'J'])) {
                 // 最宽的 MW
-                $phraseNX += $this->cfg['fontSize']*0.9;
-            } elseif ($i > 0 && in_array($phrase[$i-1], ['B', 'G', 'H', 'N'])) {
-                // 较宽易混淆的字符
-                $phraseNX += $this->cfg['fontSize']*0.8;
-            } elseif ($i > 0 && (is_numeric($phrase[$i-1])
-                    || in_array($phrase[$i-1], [6, 7, 9, 'A', 'C', 'F', 'L', 'P', 'T', 'V']))) {
-                // 不易混淆的字符 679ACFLPTV
-                $phraseNX += $this->cfg['fontSize']*0.7;
+                $phraseNX += $this->cfg['fontSize']*0.5;
+            } elseif ($i > 0 && in_array($phrase[$i-1], ['M', 'W'])) {
+                    $phraseNX += $this->cfg['fontSize']*0.8;
             } else {
-                $phraseNX += $this->cfg['fontSize']*0.6;
+                $phraseNX += $this->cfg['fontSize']*0.65;
             }
 
             // 倾斜度
-            $gradient = mt_rand(-20, 20);
+            $gradient = mt_rand(-22, 22);
 
             // 绘制一个验证码字符
             imagettftext($this->image, $this->cfg['fontSize'], $gradient, $phraseNX, $this->cfg['fontSize']*1.1, $this->color, $ttf, $phrase[$i]);
@@ -241,43 +243,6 @@ class Captcha implements CaptchaInterface
             }
         }
     }
-
-    /**
-     * 画杂点
-     * 往图片上写不同颜色的字母或数字
-     */
-    protected function noise()
-    {
-        for($i = 0; $i < $this->cfg['fontSize']/4; $i++){
-            //杂点颜色
-            $noiseColor = imagecolorallocate($this->image, mt_rand(100, 255), mt_rand(100, 255), mt_rand(100, 255));
-
-            for ($j = 0; $j < 4; $j++) {
-                // 绘杂点
-                imagestring($this->image, 5, mt_rand(-10, $this->width), mt_rand(-10, $this->height), $this->phraseSet[mt_rand(0, 25)], $noiseColor);
-            }
-        }
-    }
-
-    /**
-     * 绘制背景图片
-     */
-    protected function bgImg()
-    {
-        // 随机选择背景图片
-        $imgId = mt_rand(1, 8);
-        $bgImgPath = dirname(__DIR__) . "/assets/bgs/{$imgId}.jpg";
-        list($width, $height) = @getimagesize($bgImgPath);
-
-        // 复制背景图片设置
-        $bgImage = @imagecreatefromjpeg($bgImgPath);
-        $srcX = mt_rand(0, floor($width - $this->width));
-        $srcY = mt_rand(0, floor($height - $this->height));
-
-        @imagecopy($this->image, $bgImage, 0, 0, $srcX, $srcY, $this->width, $this->height);
-        @imagedestroy($bgImage);
-    }
-
 
     /**
      * 水平扭曲验证码图片
