@@ -5,7 +5,8 @@ require_once '../lib/Captcha.php';
 use wf\captcha\Captcha;
 
 $capt = new Captcha();
-$capt->setLevel(Captcha::LEVEL_HEIGHT);
+//$capt->setLevel(Captcha::LEVEL_HEIGHT);
+$capt->setLevel(Captcha::LEVEL_NORMAL);
 $capt->create();
 
 // set to session

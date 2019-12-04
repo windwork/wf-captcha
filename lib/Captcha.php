@@ -26,14 +26,32 @@ class Captcha implements CaptchaInterface
     const LEVEL_NORMAL = 2;
     const LEVEL_HEIGHT = 3;
     const LEVEL_VERY_HEIGHT = 4;
+    const COLORS = [
+        [0x00, 0x00, 0x80], // navy
+        [0x00, 0x00, 0xFF], // blue
+        [0x00, 0xFF, 0xFF], // aqua
+        [0x00, 0x80, 0x80], // teal
+        [0x80, 0x80, 0x00], // olive
+        [0x00, 0x80, 0x00], // green
+        [0x00, 0xFF, 0x00], // lime
+        [0xFF, 0x00, 0x00], // yellow
+        [0xFF, 0xA5, 0x00], // orange
+        [0xFF, 0x00, 0x00], // red
+        [0x80, 0x00, 0x00], // maroon
+        [0xFF, 0x00, 0xFF], // fuchsia
+        [0x80, 0x00, 0x80], // purple
+        [0x00, 0x00, 0xC0], // black
+        [0x80, 0x80, 0x80], // gray
+        [0xC0, 0xC0, 0xC0], // silver
+    ];
 
     protected $cfg = [
         'curve'     => 2,      // 画混淆曲线数量
         'distort'   => 3,      // 扭曲级别（0-9），0为不扭曲，建议为验证码字体大小/6
         'length'    => 4,      // 验证码位数
         'fontSize'  => 36,     // 验证码字体大小(px)
-        'bgColor'   => [255, 255, 255],
-        'color'     => [0, 0, 0],
+        'bgColor'   => [255,255,255],
+        'color'     => [],
     ];
 
     /**
@@ -54,7 +72,7 @@ class Captcha implements CaptchaInterface
      *
      * @var string
      */
-    protected $phraseSet = '356789ABCDEFGHKLMNPQRSTUVWXY';
+    protected $phraseSet = '23456789ABCDEFHKLMNPQRSTUVWXY';
 
     /**
      * 验证码图片实例
@@ -71,6 +89,28 @@ class Captcha implements CaptchaInterface
     private $phrase = '';
 
     /**
+     * @var string
+     */
+    private $font;
+
+    /**
+     * @return string
+     */
+    public function getFont(): string
+    {
+        return $this->font;
+    }
+
+    /**
+     * @param string $font
+     */
+    public function setFont(string $font)
+    {
+        $this->font = $font;
+    }
+
+
+    /**
      * Captcha constructor.
      * @param array $cfg = <pre> [
      *   'curve'       => 2,      // 画混淆曲线数量
@@ -82,6 +122,9 @@ class Captcha implements CaptchaInterface
     public function __construct(array $cfg = [])
     {
         $this->cfg = array_replace_recursive($this->cfg, $cfg);
+
+        $font = $cfg['font'] ?? dirname(__DIR__) . '/assets/font.ttf';
+        $this->setFont($font);
     }
 
     /**
@@ -96,18 +139,18 @@ class Captcha implements CaptchaInterface
                 $this->cfg['length'] = 4;
                 break;
             case static::LEVEL_NORMAL:
-                $this->cfg['curve'] = 2;
-                $this->cfg['distort'] = 2;
+                $this->cfg['curve'] = 1;
+                $this->cfg['distort'] = 4;
                 $this->cfg['length'] = 4;
                 break;
             case static::LEVEL_HEIGHT:
                 $this->cfg['curve'] = 2;
-                $this->cfg['distort'] = 4;
+                $this->cfg['distort'] = 5;
                 $this->cfg['length'] = 5;
                 break;
             case static::LEVEL_VERY_HEIGHT:
                 $this->cfg['curve'] = 3;
-                $this->cfg['distort'] = 5;
+                $this->cfg['distort'] = 6;
                 $this->cfg['length'] = 6;
                 break;
             default :
@@ -155,19 +198,20 @@ class Captcha implements CaptchaInterface
         // 建立一幅 $this->width x $this->height 的图像
         $this->image = imagecreate($this->width, $this->height);
 
-        imagecolorallocate($this->image, $this->cfg['bgColor'][0], $this->cfg['bgColor'][1], $this->cfg['bgColor'][2]);
+        $bgColor = $this->cfg['bgColor'] ? $this->cfg['bgColor'] : [mt_rand(0x70, 0xff), mt_rand(0x70, 0xff), mt_rand(0x70, 0xff)];
+        imagecolorallocate($this->image, $bgColor[0], $bgColor[1], $bgColor[2]);
 
-        // 验证码字体随机颜色
-        $this->color = imagecolorallocate($this->image, $this->cfg['color'][0], $this->cfg['color'][1], $this->cfg['color'][2]);
+        if ($this->cfg['color']) {
+        }
 
         $this->phrase();
 
-        for ($i = 0; $i < $this->cfg['curve']; $i++) {
-            $this->curve(); // 绘干扰线
-        }
-
         if ($this->cfg['distort']) {
             $this->distort(); // 扭曲验证码
+        }
+
+        for ($i = 0; $i < $this->cfg['curve']; $i++) {
+            $this->curve(); // 绘干扰线
         }
     }
 
@@ -176,9 +220,6 @@ class Captcha implements CaptchaInterface
      */
     protected function phrase()
     {
-        // 验证码使用随机字体
-        $ttf = dirname(__DIR__) . '/assets/font.ttf';
-
         // 绘验证码
         $phrase = [];
 
@@ -186,20 +227,15 @@ class Captcha implements CaptchaInterface
 
         for ($i = 0; $i<$this->cfg['length']; $i++) {
             $phrase[$i] = $this->phraseSet[mt_rand(0, strlen($this->phraseSet)-1)];
-            if ($i > 0 && in_array($phrase[$i-1], ['I', 'J'])) {
-                // 最宽的 MW
-                $phraseNX += $this->cfg['fontSize']*0.5;
-            } elseif ($i > 0 && in_array($phrase[$i-1], ['M', 'W'])) {
-                    $phraseNX += $this->cfg['fontSize']*0.8;
-            } else {
-                $phraseNX += $this->cfg['fontSize']*0.65;
-            }
+            $phraseNX += $this->cfg['fontSize']*0.65;
 
             // 倾斜度
             $gradient = mt_rand(-22, 22);
+            $colorRGB = self::COLORS[mt_rand(0, count(self::COLORS) - 1)];
+            $color = imagecolorallocate($this->image, $colorRGB[0], $colorRGB[1], $colorRGB[2]);
 
             // 绘制一个验证码字符
-            imagettftext($this->image, $this->cfg['fontSize'], $gradient, $phraseNX, $this->cfg['fontSize']*1.1, $this->color, $ttf, $phrase[$i]);
+            imagettftext($this->image, $this->cfg['fontSize'], $gradient, $phraseNX, $this->cfg['fontSize']*1.1, $color, $this->getFont(), $phrase[$i]);
         }
 
 
@@ -232,6 +268,8 @@ class Captcha implements CaptchaInterface
 
         $px1 = mt_rand(0, $this->width/4);  // 曲线横坐标起始位置
         $px2 = mt_rand($px1 + $this->width/3, $this->width);  // 曲线横坐标结束位置
+        $colorRGB = self::COLORS[mt_rand(0, count(self::COLORS) - 1)];
+        $color = imagecolorallocate($this->image, $colorRGB[0], $colorRGB[1], $colorRGB[2]);
 
         for ($px = $px1; $px <= $px2; $px ++) {
             if ($w == 0) {
@@ -241,7 +279,7 @@ class Captcha implements CaptchaInterface
             $py = $A * sin($w*$px + $f)+ $b + $this->height/2;  // y = Asin(ωx+φ) + b
             $i = max(2, intval($this->cfg['fontSize']/10));
             while ($i > 0) {
-                imagesetpixel($this->image, $px, $py + $i, $this->color);  // 这里(while)循环画像素点比imagettftext和imagestring用字体大小一次画出（不用这while循环）性能要好很多
+                imagesetpixel($this->image, $px, $py + $i, $color);  // 这里(while)循环画像素点比imagettftext和imagestring用字体大小一次画出（不用这while循环）性能要好很多
                 $i--;
             }
         }
