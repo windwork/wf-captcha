@@ -46,7 +46,7 @@ class Captcha implements CaptchaInterface
     ];
 
     protected $cfg = [
-        'curve'     => 2,      // 画混淆曲线数量
+        'curve'     => 1,      // 画混淆曲线数量
         'distort'   => 3,      // 扭曲级别（0-9），0为不扭曲，建议为验证码字体大小/6
         'length'    => 4,      // 验证码位数
         'fontSize'  => 36,     // 验证码字体大小(px)
