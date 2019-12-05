@@ -6,12 +6,11 @@ use wf\captcha\Captcha;
 
 $capt = new Captcha();
 //$capt->setLevel(Captcha::LEVEL_HEIGHT);
-$capt->setLevel(Captcha::LEVEL_NORMAL);
 $capt->create();
 
 // set to session
-session_start();
-$_SESSION['phrase'] = $capt->getPhrase();
+//session_start();
+//$_SESSION['phrase'] = $capt->getPhrase();
 
 $capt->output(90);
 

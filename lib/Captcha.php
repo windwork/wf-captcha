@@ -51,7 +51,6 @@ class Captcha implements CaptchaInterface
         'length'    => 4,      // 验证码位数
         'fontSize'  => 36,     // 验证码字体大小(px)
         'bgColor'   => [255,255,255],
-        'color'     => [],
     ];
 
     /**
@@ -72,7 +71,7 @@ class Captcha implements CaptchaInterface
      *
      * @var string
      */
-    protected $phraseSet = '23456789ABCDEFHKLMNPQRSTUVWXY';
+    protected $phraseSet = '2345679ABCDEFHKLMNPQRSTUVWXY';
 
     /**
      * 验证码图片实例
@@ -190,7 +189,7 @@ class Captcha implements CaptchaInterface
     public function create()
     {
         // 图片宽(px)
-        $this->width = $this->cfg['length'] * $this->cfg['fontSize'] * 0.85;
+        $this->width = $this->cfg['length'] * $this->cfg['fontSize'] * 0.86;
 
         // 图片高(px)
         $this->height = $this->cfg['fontSize'] * 1.36;
@@ -198,11 +197,8 @@ class Captcha implements CaptchaInterface
         // 建立一幅 $this->width x $this->height 的图像
         $this->image = imagecreate($this->width, $this->height);
 
-        $bgColor = $this->cfg['bgColor'] ? $this->cfg['bgColor'] : [mt_rand(0x70, 0xff), mt_rand(0x70, 0xff), mt_rand(0x70, 0xff)];
+        $bgColor = $this->cfg['bgColor'];
         imagecolorallocate($this->image, $bgColor[0], $bgColor[1], $bgColor[2]);
-
-        if ($this->cfg['color']) {
-        }
 
         $this->phrase();
 
@@ -231,8 +227,7 @@ class Captcha implements CaptchaInterface
 
             // 倾斜度
             $gradient = mt_rand(-22, 22);
-            $colorRGB = self::COLORS[mt_rand(0, count(self::COLORS) - 1)];
-            $color = imagecolorallocate($this->image, $colorRGB[0], $colorRGB[1], $colorRGB[2]);
+            $color = imagecolorallocate($this->image, mt_rand(0, 200), mt_rand(0, 200), mt_rand(0, 200));
 
             // 绘制一个验证码字符
             imagettftext($this->image, $this->cfg['fontSize'], $gradient, $phraseNX, $this->cfg['fontSize']*1.1, $color, $this->getFont(), $phrase[$i]);
@@ -241,7 +236,6 @@ class Captcha implements CaptchaInterface
 
         $this->phrase = implode('', $phrase);
     }
-
 
     /**
      * 画一条由两条连在一起构成的随机正弦函数曲线作干扰线(你可以改成更帅的曲线函数)
@@ -268,8 +262,7 @@ class Captcha implements CaptchaInterface
 
         $px1 = mt_rand(0, $this->width/4);  // 曲线横坐标起始位置
         $px2 = mt_rand($px1 + $this->width/3, $this->width);  // 曲线横坐标结束位置
-        $colorRGB = self::COLORS[mt_rand(0, count(self::COLORS) - 1)];
-        $color = imagecolorallocate($this->image, $colorRGB[0], $colorRGB[1], $colorRGB[2]);
+        $color = imagecolorallocate($this->image, mt_rand(0, 200), mt_rand(0, 200), mt_rand(0, 200));
 
         for ($px = $px1; $px <= $px2; $px ++) {
             if ($w == 0) {
